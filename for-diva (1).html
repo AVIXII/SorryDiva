@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>दिवा — एक गोष्ट</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Marathi:ital@0;1&family=Noto+Serif+Devanagari:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens: goan dusk ---------- */
+:root{
+  --paper: #F7EBD2;         /* richer warm cream, faint peach */
+  --paper-deep: #EBD8B1;    /* deeper cream for gradient base */
+  --ink: #1A2730;           /* deep twilight ink — sharp contrast */
+  --ink-soft: #42555F;      /* readable secondary */
+  --terra: #B94A2D;         /* sunset coral, saturated */
+  --terra-deep: #7A2917;    /* burnt umber */
+  --rose: #CE7E6A;          /* dusty rose accent */
+  --gold: #A27826;          /* deep amber gold */
+  --indigo: #2F4256;        /* twilight water shadow */
+  --line: rgba(122, 41, 23, 0.28);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+body{
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Noto Serif Devanagari', 'Tiro Devanagari Marathi', serif;
+  font-size: 19px;
+  line-height: 1.95;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  background-image:
+    radial-gradient(ellipse at 12% 8%, rgba(185, 74, 45, 0.10) 0%, transparent 58%),
+    radial-gradient(ellipse at 88% 92%, rgba(162, 120, 38, 0.10) 0%, transparent 58%),
+    radial-gradient(ellipse at 50% 50%, rgba(47, 66, 86, 0.04) 0%, transparent 75%),
+    linear-gradient(180deg, var(--paper) 0%, var(--paper-deep) 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  /* iOS Safari bug: background-attachment:fixed is broken; overridden below */
+  text-rendering: optimizeLegibility;
+}
+
+/* paper grain */
+body::before{
+  content:'';
+  position:fixed; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.35 0 0 0 0 0.15 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:1;
+  opacity:0.7;
+  mix-blend-mode: multiply;
+}
+
+/* ambient coastal waves at the bottom */
+.waves{
+  position:fixed; bottom:0; left:0; right:0;
+  height:140px; z-index:0;
+  pointer-events:none; opacity:0.28;
+}
+.wave{position:absolute; bottom:0; width:220%; height:100%;}
+.wave svg{width:100%; height:100%; display:block;}
+.wave-1{animation:waveMove 22s linear infinite;}
+.wave-2{animation:waveMove 34s linear infinite reverse; opacity:0.55; bottom:14px;}
+.wave-3{animation:waveMove 48s linear infinite; opacity:0.35; bottom:30px;}
+@keyframes waveMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* faint palm-leaf watermarks */
+.leaf{position:fixed; opacity:0.09; z-index:0; pointer-events:none;}
+.leaf-l{top:8%; left:-40px; transform:rotate(-20deg);}
+.leaf-r{top:55%; right:-60px; transform:rotate(160deg);}
+
+/* ---------- page ---------- */
+.page{
+  position:relative; z-index:2;
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 6vh 30px 38vh;
+}
+
+/* ---------- opening ---------- */
+.opening{
+  min-height: 86vh;
+  display:flex; flex-direction:column;
+  justify-content:center; align-items:center;
+  text-align:center;
+  padding: 6vh 0 4vh;
+}
+
+.eyebrow-top{
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 2.4em;
+  opacity: 0;
+  animation: rise 2.2s 0.2s ease-out forwards;
+}
+
+.name-wrap{
+  position: relative;
+  display: inline-block;
+  padding: 0 0.2em;
+  opacity: 0;
+  animation: rise 2.4s 0.8s ease-out forwards;
+}
+.name{
+  font-family: 'Tiro Devanagari Marathi', serif;
+  font-size: clamp(5.5rem, 22vw, 10rem);
+  color: var(--terra-deep);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-weight: 400;
+  font-style: italic;
+}
+.name-underline{
+  display:block;
+  margin: 0.2em auto 0;
+  width: 78%;
+  height: 14px;
+  color: var(--terra);
+}
+
+.intro{
+  max-width: 28ch;
+  font-size: clamp(1.25rem, 3.4vw, 1.5rem);
+  color: var(--ink-soft);
+  font-family: 'Tiro Devanagari Marathi', 'Cormorant Garamond', serif;
+  font-style: italic;
+  line-height: 1.6;
+  margin-top: 2em;
+  opacity: 0;
+  animation: rise 2s 1.8s ease-out forwards;
+}
+
+.from{
+  margin-top: 3.2em;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  opacity: 0;
+  animation: rise 2s 2.8s ease-out forwards;
+}
+
+.music-start{
+  position: fixed;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  width: fit-content;
+  margin: 0 auto;
+  z-index: 50;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4em;
+  background: rgba(247, 235, 210, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--line);
+  border-radius: 2em;
+  padding: 0.7em 1.6em 0.6em;
+  color: var(--terra);
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.88rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(122, 41, 23, 0.15);
+  opacity: 0;
+  animation: rise 2s 3.2s ease-out forwards, breathe 3.4s 4s ease-in-out infinite;
+  transition: color 0.25s, box-shadow 0.25s;
+}
+.music-start:hover{
+  color: var(--terra-deep);
+  box-shadow: 0 6px 22px rgba(122, 41, 23, 0.22);
+}
+.music-start svg{ width: 22px; height: 22px; transition: transform 0.4s ease; }
+.music-start.playing{ color: var(--gold); animation: none; opacity: 1; }
+.music-start.hidden{ opacity: 0 !important; pointer-events: none; transition: opacity 0.5s ease; }
+@media (max-width: 600px){
+  .music-start{ bottom: 18px; font-size: 0.82rem; padding: 0.65em 1.3em 0.55em; }
+  .music-start svg{ width: 20px; height: 20px; }
+}
+
+.scroll-hint{
+  margin-top: 2em;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: var(--terra);
+  font-size: 1rem;
+  opacity: 0;
+  animation: rise 2s 3.8s ease-out forwards, breathe 3.4s 4.4s ease-in-out infinite;
+}
+@keyframes breathe{0%,100%{opacity:0.4}50%{opacity:0.9}}
+
+/* ---------- sections ---------- */
+.section{
+  margin: 16vh 0;
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 1.6s ease, transform 1.6s ease;
+}
+.section.visible{opacity:1; transform:translateY(0)}
+
+.eyebrow{
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 1.4em;
+}
+
+.title{
+  font-family: 'Tiro Devanagari Marathi', serif;
+  font-size: clamp(2.3rem, 7vw, 3rem);
+  color: var(--terra-deep);
+  text-align: center;
+  margin-bottom: 2.2em;
+  line-height: 1.25;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.section p{
+  font-size: clamp(1.18rem, 2.6vw, 1.25rem);
+  margin-bottom: 1.5em;
+  color: var(--ink);
+  text-align: left;
+  hyphens: auto;
+}
+.section p em{color: var(--terra-deep); font-style: italic; font-weight: 500;}
+
+.section p.salutation{
+  font-family: 'Tiro Devanagari Marathi', serif;
+  font-style: italic;
+  font-size: 1.5rem;
+  color: var(--terra-deep);
+  margin-bottom: 1.8em;
+  text-align: left;
+}
+
+/* divider: shell-like ornament */
+.divider{
+  display:flex; justify-content:center; align-items:center;
+  gap: 18px; margin: 8vh 0;
+}
+.divider .dash{width:54px; height:1px; background: var(--line);}
+.divider svg{width: 26px; height: 26px; color: var(--gold); opacity: 0.85;}
+
+/* ---------- promises ---------- */
+.promises{
+  background: rgba(179, 91, 66, 0.06);
+  border-left: 2px solid var(--terra);
+  padding: 2.2em 1.8em 1.8em;
+  margin: 2em 0;
+  position: relative;
+}
+.promises::before{
+  content:'';
+  position:absolute; top:-1px; right:-1px; width: 18px; height: 18px;
+  background: var(--paper);
+  border-left: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  transform: rotate(45deg) translate(50%, -50%);
+  transform-origin: top right;
+}
+.promises p.promise{
+  margin-bottom: 1.2em;
+  padding-left: 1.6em;
+  position: relative;
+  font-family: 'Tiro Devanagari Marathi', serif;
+  font-style: italic;
+  font-size: 1.22rem;
+  color: var(--ink);
+  line-height: 1.75;
+  text-align: left;
+}
+.promises p.promise:last-child{margin-bottom:0;}
+.promise::before{
+  content:'—';
+  position:absolute; left:0;
+  color: var(--terra);
+  font-style: normal;
+}
+
+/* ---------- closing ---------- */
+.closing p{text-align: left;}
+
+.farewell{
+  margin-top: 3.5em;
+  text-align: right;
+  font-family: 'Tiro Devanagari Marathi', serif;
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 1.2rem;
+  line-height: 1.7;
+}
+.signed{
+  font-family: 'Tiro Devanagari Marathi', serif;
+  font-style: italic;
+  font-size: 2.6rem;
+  color: var(--terra-deep);
+  display: block;
+  margin-top: 0.4em;
+  font-weight: 400;
+}
+
+.final-note{
+  text-align: center;
+  margin-top: 10vh;
+  padding-top: 5vh;
+  font-family: 'Cormorant Garamond', 'Tiro Devanagari Marathi', serif;
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 1.15rem;
+  position: relative;
+}
+.final-note::before{
+  content:''; display:block; width: 80px; height: 1px;
+  background: var(--line);
+  margin: 0 auto 3em;
+}
+
+@keyframes rise{
+  from{opacity:0; transform:translateY(24px)}
+  to{opacity:1; transform:translateY(0)}
+}
+
+/* iOS Safari: background-attachment:fixed causes visual glitches */
+@supports (-webkit-touch-callout: none) {
+  body { background-attachment: scroll; }
+}
+
+@media (max-width: 600px){
+  body{font-size: 18px;}
+  .page{padding: 5vh 22px 32vh;}
+  .section{margin: 12vh 0;}
+  .promises{padding: 1.8em 1.3em 1.4em;}
+  .section p{font-size: 1.18rem; line-height: 1.85;}
+  .section p.salutation{font-size: 1.45rem;}
+  .promises p.promise{font-size: 1.18rem;}
+  .title{font-size: 2.15rem;}
+  .eyebrow{font-size: 0.85rem; letter-spacing: 0.28em;}
+  .eyebrow-top{font-size: 0.95rem; letter-spacing: 0.28em;}
+  .intro{font-size: 1.3rem;}
+  .from{font-size: 0.95rem;}
+  .farewell{font-size: 1.12rem;}
+  .signed{font-size: 2.3rem;}
+  .final-note{font-size: 1.08rem;}
+}
+
+/* ---------- music player ---------- */
+.music-toggle{
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 50;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: rgba(247, 235, 210, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--terra);
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(122, 41, 23, 0.15);
+  transition: all 0.25s ease;
+  opacity: 0;
+  animation: rise 2s 3.8s ease-out forwards;
+}
+.music-toggle:hover{
+  background: rgba(247, 235, 210, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(122, 41, 23, 0.22);
+}
+.music-toggle svg{width: 20px; height: 20px;}
+
+@media (max-width: 600px){
+  .music-toggle{
+    bottom: 18px;
+    right: 18px;
+    width: 44px;
+    height: 44px;
+  }
+  .music-toggle svg{width: 18px; height: 18px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ambient waves -->
+<div class="waves" aria-hidden="true">
+  <div class="wave wave-1">
+    <svg viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,60 C200,100 400,20 600,60 C800,100 1000,20 1200,60 L1200,120 L0,120 Z" fill="#B94A2D"/></svg>
+  </div>
+  <div class="wave wave-2">
+    <svg viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,70 C200,30 400,90 600,70 C800,50 1000,90 1200,70 L1200,120 L0,120 Z" fill="#A27826"/></svg>
+  </div>
+  <div class="wave wave-3">
+    <svg viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,80 C200,50 400,110 600,80 C800,50 1000,110 1200,80 L1200,120 L0,120 Z" fill="#2F4256"/></svg>
+  </div>
+</div>
+
+<!-- soft palm silhouettes -->
+<svg class="leaf leaf-l" width="220" height="260" viewBox="0 0 200 240" aria-hidden="true">
+  <g fill="#2F4256">
+    <path d="M100 230 C100 180 100 120 100 30" stroke="#2F4256" stroke-width="2" fill="none"/>
+    <ellipse cx="70" cy="60" rx="55" ry="10" transform="rotate(-35 70 60)"/>
+    <ellipse cx="130" cy="60" rx="55" ry="10" transform="rotate(35 130 60)"/>
+    <ellipse cx="60" cy="90" rx="60" ry="11" transform="rotate(-15 60 90)"/>
+    <ellipse cx="140" cy="90" rx="60" ry="11" transform="rotate(15 140 90)"/>
+    <ellipse cx="55" cy="125" rx="58" ry="10" transform="rotate(10 55 125)"/>
+    <ellipse cx="145" cy="125" rx="58" ry="10" transform="rotate(-10 145 125)"/>
+  </g>
+</svg>
+<svg class="leaf leaf-r" width="220" height="260" viewBox="0 0 200 240" aria-hidden="true">
+  <g fill="#2F4256">
+    <path d="M100 230 C100 180 100 120 100 30" stroke="#2F4256" stroke-width="2" fill="none"/>
+    <ellipse cx="70" cy="60" rx="55" ry="10" transform="rotate(-35 70 60)"/>
+    <ellipse cx="130" cy="60" rx="55" ry="10" transform="rotate(35 130 60)"/>
+    <ellipse cx="60" cy="90" rx="60" ry="11" transform="rotate(-15 60 90)"/>
+    <ellipse cx="140" cy="90" rx="60" ry="11" transform="rotate(15 140 90)"/>
+  </g>
+</svg>
+
+<main class="page">
+
+  <!-- ====== OPENING ====== -->
+  <section class="opening">
+    <div class="eyebrow-top">एका चुकीची कबुली</div>
+
+    <div class="name-wrap">
+      <h1 class="name">दिवा</h1>
+      <svg class="name-underline" viewBox="0 0 300 14" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M4 8 C 60 2, 120 12, 180 6 S 280 10, 296 7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <p class="intro">एक छोटीशी गोष्ट सांगायची आहे —<br>मनापासून.</p>
+
+    <div class="from">— ऋषभकडून</div>
+
+    <div class="scroll-hint">↓  वाच, तुझ्या वेळेला</div>
+  </section>
+
+  <!-- ====== Section 1 ====== -->
+  <section class="section" data-reveal>
+    <div class="eyebrow">कबुली</div>
+    <h2 class="title">मी चुकलो</h2>
+
+    <p class="salutation">दिवा,</p>
+
+    <p>मी चुकलो. खरंच चुकलो.</p>
+
+    <p>तुझ्या बोलण्यानं मला आतून अस्वस्थ वाटलं — पण ती अस्वस्थता <em>माझी</em> होती, तुझी नव्हे. ती मी माझ्यातच सांभाळायची होती. पण मी ओव्हरडू केलं, आणि त्या क्षणात तुला असं दुखावलं — जे कधीच नको होतं.</p>
+
+    <p>"मला असं म्हणायचं नव्हतं" — हे मी म्हणणार नाही. तू काय ऐकलंस, तुला काय लागलं — तेच खरं. आणि जबाबदारी पूर्णपणे माझी. फक्त माझी.</p>
+  </section>
+
+  <div class="divider">
+    <span class="dash"></span>
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 C 8 6, 8 10, 12 12 C 16 10, 16 6, 12 2 Z M12 12 C 6 14, 4 18, 6 22 C 10 20, 12 16, 12 12 Z M12 12 C 18 14, 20 18, 18 22 C 14 20, 12 16, 12 12 Z"/></svg>
+    <span class="dash"></span>
+  </div>
+
+  <!-- ====== Section 2 ====== -->
+  <section class="section" data-reveal lang="gom">
+    <div class="eyebrow">तुजो जुनो दुख्खो</div>
+    <h2 class="title">जी जखम मी<br>परत उगडली</h2>
+
+    <p class="salutation">दिवा,</p>
+
+    <p>तुज्या जीवनांत एक जुनी जखम आसा — जी भरून येवपाक तुका वर्सां लागलीं. तुजो तो लढो, तें तुजें धैर्य — मी तें जाणां.</p>
+
+    <p>आनी त्याच जखमेर, माज्या एका क्षणान, हांवें परत हात लावलो. जंय परत पावचें नाकां आशिल्लें — तीच जाग मीच उगडली.</p>
+
+    <p>तें ओझें मी तुज्या जाग्यार उबारूं शकना, दिवा. पूण मी तें पळयतां, मी तें नाकारीनां — आनी मी तें <em>कधींच</em> विसरचो ना.</p>
+  </section>
+
+  <div class="divider">
+    <span class="dash"></span>
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 C 8 6, 8 10, 12 12 C 16 10, 16 6, 12 2 Z M12 12 C 6 14, 4 18, 6 22 C 10 20, 12 16, 12 12 Z M12 12 C 18 14, 20 18, 18 22 C 14 20, 12 16, 12 12 Z"/></svg>
+    <span class="dash"></span>
+  </div>
+
+  <!-- ====== Section 3 ====== -->
+  <section class="section" data-reveal>
+    <div class="eyebrow">मनातलां</div>
+    <h2 class="title">तू, आनि<br>तुझो गोवा</h2>
+
+    <p class="salutation">दिवा गो,</p>
+
+    <p>मला शब्दच सापडत नायत. पण बोलायलाच होयं — नायतर भार आतून खायत रवतलो.</p>
+
+    <p>तू माका इतली आवडतीस गो. इतली. आनि त्याच माणसाला मीच अशी दुखावली — आठवलं की पोटात खड्डा पडता. तू कधी कुणासमोर मनातलां उघडायचीस सांग? फारच कमी. आनि त्या विश्वासाचोच मी असो अपमान केलो.</p>
+
+    <p>तुझो गोवा — तो समुद्र, ती लाल माती, ती सोलकढी, फिश करी — तू त्यांच्याबद्दल बोलताना तुझ्या आवाजात जी चमक येते गो, ती मला आठवते. आनि विचार करतो — <em>"अशी माणूस मी कशी दुखवली?"</em></p>
+
+    <p>तू असो जीव आहेस गो — ज्याला फक्त जपायचं, हळूच बोलायचं. आनि मी त्याच्या पूर्ण उलटा वागलो. माफ कर असं नाय म्हणत — फक्त एवढंच, तू रास्त हा. आनि ही चूक फक्त माझी हा.</p>
+  </section>
+
+  <div class="divider">
+    <span class="dash"></span>
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 C 8 6, 8 10, 12 12 C 16 10, 16 6, 12 2 Z M12 12 C 6 14, 4 18, 6 22 C 10 20, 12 16, 12 12 Z M12 12 C 18 14, 20 18, 18 22 C 14 20, 12 16, 12 12 Z"/></svg>
+    <span class="dash"></span>
+  </div>
+
+  <!-- ====== Promises ====== -->
+  <section class="section" data-reveal>
+    <div class="eyebrow">तीन शब्द</div>
+    <h2 class="title">हे पाळीन</h2>
+
+    <div class="promises">
+      <p class="promise">बोलायच्या आधी ऐकेन. खरंच ऐकेन.</p>
+      <p class="promise">माझी अस्वस्थता माझी — तुझ्यावर कधीच ओतणार नाही.</p>
+      <p class="promise">तू जे शेअर केलंस ते पवित्र आहे. त्यावर पाय हलकाच ठेवेन.</p>
+    </div>
+  </section>
+
+  <div class="divider">
+    <span class="dash"></span>
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 C 8 6, 8 10, 12 12 C 16 10, 16 6, 12 2 Z M12 12 C 6 14, 4 18, 6 22 C 10 20, 12 16, 12 12 Z M12 12 C 18 14, 20 18, 18 22 C 14 20, 12 16, 12 12 Z"/></svg>
+    <span class="dash"></span>
+  </div>
+
+  <!-- ====== CLOSING ====== -->
+  <section class="section closing" data-reveal>
+    <div class="eyebrow">आणि शेवटी</div>
+    <h2 class="title">तुझ्या वेळेला</h2>
+
+    <p class="salutation">दिवा,</p>
+
+    <p>माफी मागत नाही — तो अधिकार तुझा आहे, माझा नाही.</p>
+
+    <p>तू वेळ घे. हवा तितका. परत बोल, किंवा नको बोलू — दोन्ही ठीक. <em>तुझी शांती माझ्या कोणत्याही गरजेपेक्षा आधी येते.</em></p>
+
+    <p>तू परत आलीस, तर मी इथेच असेन — हळुवार, सजग, बदललेला. नाही आलीस — तरीही तू योग्यच केलंस.</p>
+
+    <p>तू माझ्या आयुष्यातली एक देणगी होतीस, दिवा. ती जपता आली नाही — ही माझी हार. कोणतीही सबब नाही.</p>
+
+    <div class="farewell">
+      फक्त एक कबुली,<br>
+      आणि तुझ्या शांतीच्या मागे —
+      <span class="signed">— ऋषभ</span>
+    </div>
+  </section>
+
+  <div class="final-note">
+    ~ तुझ्या वेळेसाठी, तुझ्या शांतीसाठी ~
+  </div>
+
+</main>
+
+<!-- background music: place mann-udhaan-varyache.mp3 in same folder -->
+<button class="music-start" id="musicStart" aria-label="Play background music">
+  <svg id="lockIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <rect x="5" y="11" width="14" height="10" rx="2"/>
+    <path id="lockShackle" d="M8 11V7a4 4 0 0 1 8 0v4"/>
+  </svg>
+  खाली स्क्रोल करा
+</button>
+
+<audio id="bgMusic" loop preload="none">
+  <source src="mann-udhaan-varyache.mp3" type="audio/mpeg">
+</audio>
+
+<button class="music-toggle" id="musicToggle" aria-label="Play music">
+  <svg id="musicIcon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M8 5v14l11-7z"/>
+  </svg>
+</button>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, {threshold: 0.12});
+  document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+
+  // music
+  const audio = document.getElementById('bgMusic');
+  const toggle = document.getElementById('musicToggle');
+  const icon = document.getElementById('musicIcon');
+  const startBtn = document.getElementById('musicStart');
+
+  const playPath = '<path d="M8 5v14l11-7z"/>';
+  const pausePath = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
+
+  const shackle = document.getElementById('lockShackle');
+  const lockedShackle = 'M8 11V7a4 4 0 0 1 8 0v4';
+  const unlockedShackle = 'M8 11V7a4 4 0 0 1 7.9-.3';
+
+  const setPlayingUI = () => {
+    icon.innerHTML = pausePath;
+    toggle.setAttribute('aria-label', 'Pause music');
+    shackle.setAttribute('d', unlockedShackle);
+    startBtn.lastChild.textContent = ' खाली जा';
+    startBtn.classList.add('playing');
+    startBtn.setAttribute('aria-label', 'Pause background music');
+  };
+
+  const setPausedUI = () => {
+    icon.innerHTML = playPath;
+    toggle.setAttribute('aria-label', 'Play music');
+    shackle.setAttribute('d', lockedShackle);
+    startBtn.lastChild.textContent = ' खाली स्क्रोल करा';
+    startBtn.classList.remove('playing');
+    startBtn.setAttribute('aria-label', 'Play background music');
+  };
+
+  // lock scroll until user clicks the button
+  document.body.style.overflow = 'hidden';
+
+  const unlock = () => {
+    document.body.style.overflow = '';
+    startBtn.classList.add('hidden');
+  };
+
+  const playMusic = () => {
+    audio.volume = 0.45;
+    audio.play().then(setPlayingUI).catch(() => {});
+  };
+
+  startBtn.addEventListener('click', () => {
+    if (audio.paused) { unlock(); playMusic(); }
+    else { audio.pause(); setPausedUI(); }
+  });
+
+  toggle.addEventListener('click', () => {
+    if (audio.paused) playMusic(); else { audio.pause(); setPausedUI(); }
+  });
+</script>
+
+</body>
+</html>
